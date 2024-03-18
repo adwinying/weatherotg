@@ -1,0 +1,15 @@
+package components
+
+import i "github.com/callsamu/templicons"
+
+templ Header() {
+	<header>
+		<a class="inline-flex gap-3 items-center" href="/">
+			@i.Icon("mdi:weather-partly-snowy-rainy", i.Params().SetDimensions(40, 40))
+			<div>
+				<h1 class="text-2xl font-bold">WeatherOTG</h1>
+				<p class="text-xs italic">Weather, on the Go</p>
+			</div>
+		</a>
+	</header>
+}

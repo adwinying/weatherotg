@@ -2,7 +2,32 @@ package templates
 
 import "github.com/adwinying/weatherotg/templates/pages"
 
-templ Layout(title string, metaTags, bodyContent templ.Component) {
+func getTitle(title string) string {
+	if title == "" {
+		return "WeatherOTG"
+	} else {
+		return title + " | WeatherOTG"
+	}
+}
+
+func getDescription(description string) string {
+	if description == "" {
+		return "Weather on the Go; Powered by Golang, TailwindCSS, DaisyUI, and HTMX"
+	} else {
+		return description
+	}
+}
+
+// Page-specific Meta Tags
+templ MetaTags(title, keywords, description string) {
+	<title>{ getTitle(title) }</title>
+	<meta name="description" content={ getDescription(description) }/>
+	if keywords != "" {
+		<meta name="keywords" content={ keywords }/>
+	}
+}
+
+templ Layout(metaTags, bodyContent templ.Component) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -11,7 +36,6 @@ templ Layout(title string, metaTags, bodyContent templ.Component) {
 			<meta http-equiv="X-UA-Compatible" content="ie=edge"/>
 			<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com; connect-src 'self' ws://localhost:*; img-src 'self' data:*;"/>
 			<meta name="theme-color" content="#FEFEF5"/>
-			<title>{ title }</title>
 			@metaTags
 			<link rel="dns-prefetch" href="//fonts.googleapis.com"/>
 			<link rel="dns-prefetch" href="//fonts.gstatic.com"/>
@@ -26,8 +50,14 @@ templ Layout(title string, metaTags, bodyContent templ.Component) {
 			<link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.3/dist/full.min.css" rel="stylesheet" type="text/css"/>
 			<script src="https://cdn.tailwindcss.com"></script>
 		</head>
-		<body onload={ pages.BodyScripts() }>
-			@bodyContent
+		<body
+			data-theme="dracula"
+			class="bg-base-100 min-h-screen"
+			onload={ pages.BodyScripts() }
+		>
+			<div class="mx-auto container max-w-lg" hx-boost="true" hx-push-url="true">
+				@bodyContent
+			</div>
 			<script src="https://unpkg.com/htmx.org@1.9.10"></script>
 		</body>
 	</html>

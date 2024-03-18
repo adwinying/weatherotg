@@ -12,24 +12,13 @@ import (
 
 // indexViewHandler handles a view for the index page.
 func indexViewHandler(w http.ResponseWriter, r *http.Request) {
-
-	// Define template meta tags.
-	metaTags := pages.MetaTags(
-		"gowebly, htmx example page, go with htmx",               // define meta keywords
-		"Welcome to example! You're here because it worked out.", // define meta description
-	)
-
-	// Define template body content.
-	bodyContent := pages.BodyContent(
-		"Welcome to example!",                // define h1 text
-		"You're here because it worked out.", // define p text
-	)
-
 	// Define template layout for index page.
 	indexTemplate := templates.Layout(
-		"Welcome to example!", // define title text
-		metaTags,              // define meta tags
-		bodyContent,           // define body content
+		templates.MetaTags("", "", ""),
+		pages.BodyContent(
+			"Welcome to example!",                // define h1 text
+			"You're here because it worked out.", // define p text
+		),
 	)
 
 	// Render index page template.
