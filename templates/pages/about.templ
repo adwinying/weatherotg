@@ -1,0 +1,14 @@
+package pages
+
+import i "github.com/callsamu/templicons"
+
+templ AboutContent() {
+	<h1 class="text-2xl font-bold mb-2">About</h1>
+	<p>
+		<span class="inline-block translate-y-0.5 -mr-1">
+			@i.Icon("mdi:weather-partly-snowy-rainy", nil)
+		</span>
+		<span class="font-bold">WeatherOTG</span>
+		is a simple weather app powered by Go, TailwindCSS, DaisyUI and HTMX.
+	</p>
+}

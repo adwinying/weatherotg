@@ -10,7 +10,6 @@ import (
 	"github.com/adwinying/weatherotg/templates/pages"
 )
 
-// indexViewHandler handles a view for the index page.
 func indexViewHandler(w http.ResponseWriter, r *http.Request) {
 	// Check if path is not root
 	if r.URL.Path != "/" {
@@ -29,6 +28,23 @@ func indexViewHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Render index page template.
 	if err := htmx.NewResponse().RenderTempl(r.Context(), w, indexTemplate); err != nil {
+		errorHandler(w, r, http.StatusInternalServerError)
+		return
+	}
+
+	// Send log message.
+	slog.Info("", "method", r.Method, "status", http.StatusOK, "path", r.URL.Path)
+}
+
+func aboutViewHandler(w http.ResponseWriter, r *http.Request) {
+	// Define template layout for about page.
+	aboutTemplate := templates.Layout(
+		templates.MetaTags("About", "", ""),
+		pages.AboutContent(),
+	)
+
+	// Render about page template.
+	if err := htmx.NewResponse().RenderTempl(r.Context(), w, aboutTemplate); err != nil {
 		errorHandler(w, r, http.StatusInternalServerError)
 		return
 	}

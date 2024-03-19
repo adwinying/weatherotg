@@ -26,8 +26,9 @@ func runServer() error {
 	// Handle static files from the embed FS (with a custom handler).
 	mux.Handle("GET /static/", gowebly.StaticFileServerHandler(http.FS(static)))
 
-	// Handle index page view.
+	// Handle page views
 	mux.HandleFunc("GET /", indexViewHandler)
+	mux.HandleFunc("GET /about", aboutViewHandler)
 
 	// Handle API endpoints.
 	mux.HandleFunc("GET /api/hello-world", showContentAPIHandler)
