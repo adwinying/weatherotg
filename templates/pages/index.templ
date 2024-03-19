@@ -1,12 +1,6 @@
 package pages
 
-import "github.com/adwinying/weatherotg/templates/components"
-
-// BodyContent defines HTML content.
-templ BodyContent(h1, text string) {
-	<div class="py-3">
-		@components.Header()
-	</div>
+templ IndexContent(h1, text string) {
 	<div>
 		<a href="https://gowebly.org" target="_blank">
 			<img src="/static/images/gowebly.svg" class="gowebly logo" alt="Gowebly logo"/>
@@ -18,7 +12,7 @@ templ BodyContent(h1, text string) {
 			Edit this styled text in the <code>./templates/pages/index.templ</code> file.
 		</p>
 		<div class="content">
-			<button hx-get="/api/hello-world" hx-target="#htmx-result" class="btn btn-primary">Hello, World!</button>
+			<button hx-get="/api/hello-world" hx-target="#htmx-result" class="btn btn-primary" hx-push-url="false">Hello, World!</button>
 			<div id="htmx-result"></div>
 		</div>
 		<p class="read-the-docs">
@@ -32,9 +26,6 @@ templ BodyContent(h1, text string) {
 			<a href="https://gowebly.org" target="_blank">Documentation</a> &sdot;
 			<a href="https://github.com/gowebly/gowebly" target="_blank">GitHub</a>
 		</p>
-	</div>
-	<div class="py-3">
-		@components.Footer()
 	</div>
 }
 

@@ -6,7 +6,6 @@ import (
 	"log/slog"
 	"net/http"
 	"strconv"
-	"time"
 
 	gowebly "github.com/gowebly/helpers"
 )
@@ -22,25 +21,19 @@ func runServer() error {
 		return err
 	}
 
+	mux := http.NewServeMux()
+
 	// Handle static files from the embed FS (with a custom handler).
-	http.Handle("GET /static/", gowebly.StaticFileServerHandler(http.FS(static)))
+	mux.Handle("GET /static/", gowebly.StaticFileServerHandler(http.FS(static)))
 
 	// Handle index page view.
-	http.HandleFunc("GET /", indexViewHandler)
+	mux.HandleFunc("GET /", indexViewHandler)
 
 	// Handle API endpoints.
-	http.HandleFunc("GET /api/hello-world", showContentAPIHandler)
-
-	// Create a new server instance with options from environment variables.
-	// For more information, see https://blog.cloudflare.com/the-complete-guide-to-golang-net-http-timeouts/
-	server := &http.Server{
-		Addr:         fmt.Sprintf(":%d", port),
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
-	}
+	mux.HandleFunc("GET /api/hello-world", showContentAPIHandler)
 
 	// Send log message.
 	slog.Info("Starting server...", "port", port)
 
-	return server.ListenAndServe()
+	return http.ListenAndServe(fmt.Sprintf(":%d", port), mux)
 }

@@ -1,5 +1,7 @@
 github.com/a-h/templ v0.2.598 h1:6jMIHv6wQZvdPxTuv87erW4RqN/FPU0wk7ZHN5wVuuo=
 github.com/a-h/templ v0.2.598/go.mod h1:SA7mtYwVEajbIXFRh3vKdYm/4FYyLQAtPH1+KxzGPA8=
+github.com/a-h/templ v0.2.639 h1:iNyjh6gllEshVDcj3taqtz7dltPKBtncvP+M8HNGdGQ=
+github.com/a-h/templ v0.2.639/go.mod h1:SA7mtYwVEajbIXFRh3vKdYm/4FYyLQAtPH1+KxzGPA8=
 github.com/angelofallars/htmx-go v0.5.0 h1:L7M48cCH7nX8cV5wRYn04pN6AE4qNdh86iTbuKxhnIo=
 github.com/angelofallars/htmx-go v0.5.0/go.mod h1:izXk6A+Jllc3vXs1dUvxUJs/jE0weiEC07ZPlCVi4cc=
 github.com/callsamu/templicons v0.0.0-20231116180308-92f3b7e3a431 h1:8DfvzLGQeaYcGKFl5xmFWVEdP/mmHAjSw/VlW6Oy1vQ=
