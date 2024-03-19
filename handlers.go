@@ -14,7 +14,7 @@ import (
 func indexViewHandler(w http.ResponseWriter, r *http.Request) {
 	// Check if path is not root
 	if r.URL.Path != "/" {
-		notFoundHandler(w, r)
+		errorHandler(w, r, http.StatusNotFound)
 		return
 	}
 
@@ -29,14 +29,12 @@ func indexViewHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Render index page template.
 	if err := htmx.NewResponse().RenderTempl(r.Context(), w, indexTemplate); err != nil {
-		// If not, return HTTP 400 error.
-		slog.Error("render template", "method", r.Method, "status", http.StatusInternalServerError, "path", r.URL.Path)
-		w.WriteHeader(http.StatusInternalServerError)
+		errorHandler(w, r, http.StatusInternalServerError)
 		return
 	}
 
 	// Send log message.
-	slog.Info("render page", "method", r.Method, "status", http.StatusOK, "path", r.URL.Path)
+	slog.Info("", "method", r.Method, "status", http.StatusOK, "path", r.URL.Path)
 }
 
 // showContentAPIHandler handles an API endpoint to show content.
@@ -44,9 +42,7 @@ func showContentAPIHandler(w http.ResponseWriter, r *http.Request) {
 	// Check, if the current request has a 'HX-Request' header.
 	// For more information, see https://htmx.org/docs/#request-headers
 	if !htmx.IsHTMX(r) {
-		// If not, return HTTP 400 error.
-		slog.Error("request API", "method", r.Method, "status", http.StatusBadRequest, "path", r.URL.Path)
-		w.WriteHeader(http.StatusBadRequest)
+		errorHandler(w, r, http.StatusBadRequest)
 		return
 	}
 
@@ -57,26 +53,34 @@ func showContentAPIHandler(w http.ResponseWriter, r *http.Request) {
 	htmx.NewResponse().Write(w)
 
 	// Send log message.
-	slog.Info("request API", "method", r.Method, "status", http.StatusOK, "path", r.URL.Path)
+	slog.Info("", "method", r.Method, "status", http.StatusOK, "path", r.URL.Path)
 }
 
-func notFoundHandler(w http.ResponseWriter, r *http.Request) {
-	// Define template layout for 404 page.
-	notFoundTemplate := templates.Layout(
-		templates.MetaTags("404 Not Found", "", ""),
-		pages.NotFoundContent(),
+func errorHandler(w http.ResponseWriter, r *http.Request, status int) {
+	errName := http.StatusText(status)
+	if errName == "" {
+		errName = "Error"
+	}
+
+	errDescription := "An error has occurred. Please try again later."
+	if status == http.StatusNotFound {
+		errDescription = "The page you are looking for does not exist."
+	}
+
+	// Define template layout for error page.
+	errorTemplate := templates.Layout(
+		templates.MetaTags(errName, "", ""),
+		pages.ErrorContent(status, errName, errDescription),
 	)
 
-  // Set HTTP 404 status
-  w.WriteHeader(http.StatusNotFound)
+	// Set HTTP status
+	w.WriteHeader(status)
 
-	// Render 404 page template.
-	if err := htmx.NewResponse().RenderTempl(r.Context(), w, notFoundTemplate); err != nil {
-		// If not, return HTTP 400 error.
-		slog.Error("render template", "method", r.Method, "status", http.StatusInternalServerError, "path", r.URL.Path)
-		w.WriteHeader(http.StatusInternalServerError)
+	// Render error page template.
+	if err := htmx.NewResponse().RenderTempl(r.Context(), w, errorTemplate); err != nil {
+		slog.Error("", "method", r.Method, "status", status, "path", r.URL.Path)
 		return
 	}
 
-  slog.Info("render page", "method", r.Method, "status", http.StatusNotFound, "path", r.URL.Path)
+	slog.Info("", "method", r.Method, "status", status, "path", r.URL.Path)
 }

@@ -1,0 +1,8 @@
+package pages
+
+import "strconv"
+
+templ ErrorContent(errorCode int, errorName, errorDescription string) {
+	<h1 class="text-2xl font-bold">{ strconv.Itoa(errorCode) } - {errorName}</h1>
+	<p>{errorDescription}</p>
+}
