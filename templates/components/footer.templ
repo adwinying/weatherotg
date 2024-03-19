@@ -1,0 +1,14 @@
+package components
+
+import (
+	"strconv"
+	"time"
+)
+
+templ Footer() {
+	<footer>
+		&copy; { strconv.Itoa(time.Now().Year()) } WeatherOTG &sdot;
+		<a class="underline" href="/about">About</a> &sdot;
+		<a class="underline" href="//github.com/adwinying/weatherotg">Github</a>
+	</footer>
+}
