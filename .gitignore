@@ -19,9 +19,11 @@ bin/
 dist-ssr/
 dist/
 *_templ.go
+static/styles.css
 
 # Vendor folders.
 vendor/
+node_modules/
 
 # Temp folders.
 tmp/

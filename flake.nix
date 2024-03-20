@@ -12,6 +12,7 @@
     in {
       devShell = with pkgs; mkShell {
         buildInputs = [
+          bun
           go_1_22
           air
           templ
@@ -20,6 +21,7 @@
 
         shellHook = ''
           echo "`${pkgs.go}/bin/go version`"
+          echo "bun: v`${pkgs.bun}/bin/bun --version`"
         '';
       };
     });

@@ -1,3 +1,5 @@
 procs:
+  css:
+    shell: "bun run css:watch"
   dev:
     shell: "air"
