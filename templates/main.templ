@@ -30,10 +30,20 @@ templ MetaTags(title, keywords, description string) {
 }
 
 script BodyScripts() {
-	console.log(
-		"You're using Templ package to generate HTML content!",
-		"Edit this JavaScript code in the `./templates/pages/index.templ` file.",
-	);
+	const flashErrorAlert = () => {
+		const alertTemplate = `
+			<div role="alert" class="template-error-alert alert alert-error animate-in fade-in zoom-in slide-in-from-right">
+				<svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+				<span>An error has occurred, please try again later.</span>
+				<button class="btn btn-sm btn-ghost" onclick="this.parentElement.remove()" aria-label="Dismiss Alert">&cross;</button>
+			</div>
+		`
+		const errorAlerts = document.getElementById('error-alerts')
+		errorAlerts.insertAdjacentHTML('beforeend', alertTemplate)
+	}
+
+	document.addEventListener('htmx:responseError', flashErrorAlert)
+	document.addEventListener('htmx:sendError', flashErrorAlert)
 }
 
 templ Layout(metaTags, content templ.Component) {
@@ -71,6 +81,7 @@ templ Layout(metaTags, content templ.Component) {
 				<div class="py-3">
 					@components.Footer()
 				</div>
+				<div id="error-alerts" class="fixed top-4 right-4 w-[clamp(20rem,33vw,25rem)] space-y-3"></div>
 			</div>
 			<script src="https://unpkg.com/htmx.org@1.9.10"></script>
 		</body>
