@@ -9,3 +9,5 @@ require (
 )
 
 require github.com/callsamu/templicons v0.0.0-20231116180308-92f3b7e3a431
+
+require github.com/joho/godotenv v1.5.1 // indirect
