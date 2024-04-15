@@ -1,11 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
+	"strings"
 
 	"github.com/angelofallars/htmx-go"
 
+	"github.com/adwinying/weatherotg/lib"
 	"github.com/adwinying/weatherotg/templates"
 	"github.com/adwinying/weatherotg/templates/pages"
 )
@@ -17,12 +20,20 @@ func indexViewHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get location from IP
+	ip := strings.Split(r.RemoteAddr, ":")[0]
+	city, err := lib.GetCityFromIp(ip)
+	if err != nil {
+		errorHandler(w, r, http.StatusInternalServerError)
+		return
+	}
+
 	// Define template layout for index page.
 	indexTemplate := templates.Layout(
 		templates.MetaTags("", "", ""),
 		pages.IndexContent(
-			"Welcome to example!",                // define h1 text
-			"You're here because it worked out.", // define p text
+			"Welcome to example!",               // define h1 text
+			fmt.Sprintf("You are in %s.", city), // define p text
 		),
 	)
 
