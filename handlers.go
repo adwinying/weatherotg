@@ -23,9 +23,8 @@ func indexViewHandler(w http.ResponseWriter, r *http.Request) {
 	// Get location from IP
 	ip := strings.Split(r.RemoteAddr, ":")[0]
 	city, err := lib.GetCityFromIp(ip)
-	if err != nil {
-		errorHandler(w, r, http.StatusInternalServerError)
-		return
+	if err != nil || city == "Undefined" {
+		city = "Tokyo"
 	}
 
 	// Define template layout for index page.
