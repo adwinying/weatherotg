@@ -27,12 +27,19 @@ func indexViewHandler(w http.ResponseWriter, r *http.Request) {
 		city = "Tokyo"
 	}
 
+	// Get weather info
+	weatherInfo, err := lib.GetWeatherInfo(city)
+	if err != nil {
+		errorHandler(w, r, http.StatusInternalServerError)
+		return
+	}
+
 	// Define template layout for index page.
 	indexTemplate := templates.Layout(
 		templates.MetaTags("", "", ""),
 		pages.IndexContent(
-			"Welcome to example!",               // define h1 text
-			fmt.Sprintf("You are in %s.", city), // define p text
+			"Welcome to example!",                       // define h1 text
+			fmt.Sprintf("You are in %+v.", weatherInfo), // define p text
 		),
 	)
 
