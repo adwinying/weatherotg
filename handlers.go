@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log/slog"
 	"net/http"
 	"strings"
@@ -36,11 +35,8 @@ func indexViewHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Define template layout for index page.
 	indexTemplate := templates.Layout(
-		templates.MetaTags("", "", ""),
-		pages.IndexContent(
-			"Welcome to example!",                       // define h1 text
-			fmt.Sprintf("You are in %+v.", weatherInfo), // define p text
-		),
+		templates.MetaTags("WeatherOTG", "", ""),
+		pages.IndexContent(city, weatherInfo),
 	)
 
 	// Render index page template.
