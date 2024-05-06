@@ -33,10 +33,17 @@ func indexViewHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+  // Format weather info
+  formattedWeatherInfo, err := lib.FormatWeatherInfo(weatherInfo)
+  if err != nil {
+		errorHandler(w, r, http.StatusInternalServerError)
+		return
+  }
+
 	// Define template layout for index page.
 	indexTemplate := templates.Layout(
 		templates.MetaTags("WeatherOTG", "", ""),
-		pages.IndexContent(city, weatherInfo),
+		pages.IndexContent(city, formattedWeatherInfo),
 	)
 
 	// Render index page template.

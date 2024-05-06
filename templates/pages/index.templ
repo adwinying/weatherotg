@@ -2,11 +2,23 @@ package pages
 
 import (
 	"github.com/adwinying/weatherotg/lib"
+	i "github.com/callsamu/templicons"
+	"fmt"
 )
 
-templ IndexContent(location string, weatherInfo *lib.WeatherInfo) {
-	<div>
-		<h1 class="text-xl">Weather in { location }</h1>
-		<p>Temperature: { weatherInfo.CurrentCondition[0].TempC }°C</p>
+templ IndexContent(location string, weatherInfo *lib.FormattedWeather) {
+	<div class="flex gap-3 mx-auto max-w-fit my-4">
+		<div>
+			@i.Icon(weatherInfo.Current.Icon, i.Params().SetDimensions(80, 80))
+		</div>
+		<div>
+			<h1 class="text-xl font-bold">{ location }</h1>
+			<h2 class="leading-tight">{ weatherInfo.Current.Description }</h2>
+			<p>
+				{ weatherInfo.Current.Detail.TempC }°C,
+				{ fmt.Sprintf("%.2f", weatherInfo.Current.WindSpeedMs) }m/s
+				{ weatherInfo.Current.Detail.Winddir16Point }
+			</p>
+		</div>
 	</div>
 }
