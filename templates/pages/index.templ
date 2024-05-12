@@ -24,14 +24,15 @@ func formattedForecastsToTemplateForecasts(formatted []lib.FormattedForecastWeat
 }
 
 templ IndexContent(location string, weatherInfo *lib.FormattedWeather) {
-	<div class="flex gap-3 mx-auto max-w-fit my-4">
+	<div class="flex items-center gap-3 mx-auto max-w-fit my-4">
 		<div>
 			@i.Icon(weatherInfo.Current.Icon, i.Params().SetDimensions(80, 80))
 		</div>
 		<div>
-			<h1 class="text-xl font-bold">{ location }</h1>
-			<h2 class="leading-tight">{ weatherInfo.Current.Description }</h2>
-			<p>
+			<h1 class="text-2xl font-bold">{ location }</h1>
+			<p class="leading-snug">
+				{ weatherInfo.Current.Description }
+				<br/>
 				{ weatherInfo.Current.Detail.TempC }°C,
 				{ fmt.Sprintf("%.2f", weatherInfo.Current.WindSpeedMs) }m/s
 				{ weatherInfo.Current.Detail.Winddir16Point }
@@ -39,10 +40,7 @@ templ IndexContent(location string, weatherInfo *lib.FormattedWeather) {
 		</div>
 	</div>
 	<div class="space-y-3">
-		<div class="card rounded bg-neutral shadow-xl pt-3 pb-6">
-			<h3 class="mb-3 font-bold text-center">Forecast</h3>
-			@components.ForecastGroup(formattedForecastsToTemplateForecasts(weatherInfo.Forecast[:]))
-		</div>
+		@components.ForecastGroup(formattedForecastsToTemplateForecasts(weatherInfo.Forecast[:]))
 		for _, daily := range weatherInfo.Daily {
 			<div class="card rounded bg-neutral shadow-xl pt-3 pb-6">
 				<h3 class="mb-3 font-bold text-center">
