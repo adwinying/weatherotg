@@ -43,5 +43,30 @@ templ IndexContent(location string, weatherInfo *lib.FormattedWeather) {
 				}
 			</div>
 		</div>
+		for _, daily := range weatherInfo.Daily {
+			<div class="card rounded bg-neutral shadow-xl pt-3 pb-6">
+				<h3 class="mb-3 font-bold text-center">
+					{ daily.Timestamp.Format("2006/01/02") }
+				</h3>
+				<div class="grid grid-cols-4 gap-y-3 divide-x">
+					for _, hourly := range daily.Hourly {
+						<div class="[&:nth-child(4n+1)]:!border-0 flex flex-col items-center py-2">
+							<h4 class="mb-1">{ hourly.Timestamp.Format("15:04") }</h4>
+							<div class="tooltip mb-2" data-tip={ hourly.Description }>
+								@i.Icon(hourly.Icon, i.Params().SetDimensions(40, 40))
+							</div>
+							<div class="grid grid-cols-[min-content_1fr] gap-x-2 gap-y-1">
+								@i.Icon("mdi:thermometer-lines", i.Params().SetDimensions(20, 20))
+								<span>{ hourly.Detail.TempC }°C</span>
+								@i.Icon("mdi:weather-windy", i.Params().SetDimensions(20, 20))
+								<span>{ fmt.Sprintf("%d", int(hourly.WindSpeedMs)) }m/s</span>
+								@i.Icon("mdi:cloud-percent", i.Params().SetDimensions(20, 20))
+								<span>{ hourly.Detail.ChanceOfRain }%</span>
+							</div>
+						</div>
+					}
+				</div>
+			</div>
+		}
 	</div>
 }
