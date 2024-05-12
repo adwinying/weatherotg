@@ -1,0 +1,39 @@
+package components
+
+import (
+	i "github.com/callsamu/templicons"
+)
+
+type Forecast struct {
+	Title        string
+	Description  string
+	Icon         string
+	TempC        string
+	ChanceOfRain string
+	WindSpeedMs  string
+}
+
+templ forecastEntry(forecast Forecast) {
+	<div class="[&:nth-child(4n+1)]:!border-0 flex flex-col items-center py-2">
+		<h4 class="text-lg mb-1">{ forecast.Title }</h4>
+		<div class="tooltip mb-2" data-tip={ forecast.Description }>
+			@i.Icon(forecast.Icon, i.Params().SetDimensions(40, 40))
+		</div>
+		<div class="grid grid-cols-[min-content_1fr] gap-x-2 gap-y-1">
+			@i.Icon("mdi:thermometer-lines", i.Params().SetDimensions(20, 20))
+			<span>{ forecast.TempC }°C</span>
+			@i.Icon("mdi:weather-windy", i.Params().SetDimensions(20, 20))
+			<span>{ forecast.WindSpeedMs }m/s</span>
+			@i.Icon("mdi:cloud-percent", i.Params().SetDimensions(20, 20))
+			<span>{ forecast.ChanceOfRain }%</span>
+		</div>
+	</div>
+}
+
+templ ForecastGroup(forecasts []Forecast) {
+	<div class="grid grid-cols-4 gap-y-3 divide-x">
+		for _, forecast := range forecasts {
+			@forecastEntry(forecast)
+		}
+	</div>
+}
