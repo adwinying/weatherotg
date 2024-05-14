@@ -19,6 +19,12 @@ func indexViewHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Extract mode param from query string
+	mode, err := lib.ParseDisplayMode(r.URL.Query().Get("mode"))
+	if err != nil {
+		mode = lib.Default
+	}
+
 	// Get location from IP
 	ip := strings.Split(r.RemoteAddr, ":")[0]
 	city, err := lib.GetCityFromIp(ip)
@@ -33,17 +39,18 @@ func indexViewHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-  // Format weather info
-  formattedWeatherInfo, err := lib.FormatWeatherInfo(weatherInfo)
-  if err != nil {
+	// Format weather info
+	formattedWeatherInfo, err := lib.FormatWeatherInfo(weatherInfo)
+	if err != nil {
 		errorHandler(w, r, http.StatusInternalServerError)
 		return
-  }
+	}
 
 	// Define template layout for index page.
 	indexTemplate := templates.Layout(
 		templates.MetaTags("WeatherOTG", "", ""),
-		pages.IndexContent(city, formattedWeatherInfo),
+		&mode,
+		pages.IndexContent(mode, city, formattedWeatherInfo),
 	)
 
 	// Render index page template.
@@ -60,6 +67,7 @@ func aboutViewHandler(w http.ResponseWriter, r *http.Request) {
 	// Define template layout for about page.
 	aboutTemplate := templates.Layout(
 		templates.MetaTags("About", "", ""),
+		nil,
 		pages.AboutContent(),
 	)
 
@@ -106,6 +114,7 @@ func errorHandler(w http.ResponseWriter, r *http.Request, status int) {
 	// Define template layout for error page.
 	errorTemplate := templates.Layout(
 		templates.MetaTags(errName, "", ""),
+		nil,
 		pages.ErrorContent(status, errName, errDescription),
 	)
 

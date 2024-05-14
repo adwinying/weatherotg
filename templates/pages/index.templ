@@ -23,31 +23,88 @@ func formattedForecastsToTemplateForecasts(formatted []lib.FormattedForecastWeat
 	return result
 }
 
-templ IndexContent(location string, weatherInfo *lib.FormattedWeather) {
-	<div class="flex items-center gap-3 mx-auto max-w-fit my-4">
-		<div>
-			@i.Icon(weatherInfo.Current.Icon, i.Params().SetDimensions(80, 80))
+templ IndexContent(mode lib.DisplayMode, location string, weatherInfo *lib.FormattedWeather) {
+	if mode != lib.Minimal {
+		<div class="flex items-center justify-end gap-3">
+			<span
+				id="select-mode-loading"
+				class="hidden h-full flex items-center justify-center *:animate-spin"
+			>
+				@i.Icon("mdi:loading", i.Params().SetDimensions(28, 28))
+			</span>
+			<label class="relative form-control w-fit">
+				<div
+					id="select-mode-overlay"
+					class="hidden absolute bg-white/10 inset-0 z-50 rounded-lg"
+				></div>
+				<select
+					id="select-mode"
+					class="select select-bordered max-w-xs"
+					onchange="onModeUpdate(event)"
+				>
+					<option disabled>Display Mode</option>
+					for _, displayMode := range lib.DisplayModeOrder {
+						<option
+							selected?={ mode == displayMode }
+							value={ string(displayMode) }
+						>
+							{ lib.DisplayModeStringMap[displayMode] }
+						</option>
+					}
+				</select>
+			</label>
 		</div>
-		<div>
-			<h1 class="text-2xl font-bold">{ location }</h1>
-			<p class="leading-snug">
-				{ weatherInfo.Current.Description }
-				<br/>
-				{ weatherInfo.Current.Detail.TempC }°C,
-				{ fmt.Sprintf("%.2f", weatherInfo.Current.WindSpeedMs) }m/s
-				{ weatherInfo.Current.Detail.Winddir16Point }
-			</p>
-		</div>
-	</div>
-	<div class="space-y-3">
-		@components.ForecastGroup(formattedForecastsToTemplateForecasts(weatherInfo.Forecast[:]))
-		for _, daily := range weatherInfo.Daily {
-			<div class="card rounded bg-neutral shadow-xl pt-3 pb-6">
-				<h3 class="mb-3 font-bold text-center">
-					{ daily.Timestamp.Format("2006/01/02") }
-				</h3>
-				@components.ForecastGroup(formattedForecastsToTemplateForecasts(daily.Hourly[:]))
+		<script>
+      function onModeUpdate(e) {
+        updateUrlQuery('mode', e.target.value)
+        const $loading = document.querySelector('#select-mode-loading')
+        $loading.classList.remove('hidden')
+        const $overlay = document.querySelector('#select-mode-overlay')
+        $overlay.classList.remove('hidden')
+        const $select = document.querySelector('#select-mode')
+        $select.disabled = true
+        const $content = document.querySelector('#weather-info')
+        $content.classList.add('opacity-50')
+      }
+    </script>
+	}
+	<div id="weather-info">
+		<div class="flex items-center gap-3 mx-auto max-w-fit my-4">
+			<div>
+				@i.Icon(weatherInfo.Current.Icon, i.Params().SetDimensions(80, 80))
 			</div>
-		}
+			<div>
+				<h1 class="text-2xl font-bold">{ location }</h1>
+				<p class="leading-snug">
+					{ weatherInfo.Current.Description }
+					<br/>
+					{ weatherInfo.Current.Detail.TempC }°C,
+					{ fmt.Sprintf("%.2f", weatherInfo.Current.WindSpeedMs) }m/s
+					{ weatherInfo.Current.Detail.Winddir16Point }
+				</p>
+			</div>
+		</div>
+		<div class="space-y-3 mb-6">
+			if mode == lib.Default {
+				@components.ForecastGroup(formattedForecastsToTemplateForecasts(weatherInfo.Forecast[:]))
+			}
+			if mode == lib.Extended {
+				for _, daily := range weatherInfo.Daily {
+					<div class="card rounded bg-neutral shadow-xl pt-3 pb-6">
+						<h3 class="mb-3 font-bold text-center">
+							{ daily.Timestamp.Format("2006/01/02") }
+						</h3>
+						@components.ForecastGroup(formattedForecastsToTemplateForecasts(daily.Hourly[:]))
+					</div>
+				}
+			}
+		</div>
 	</div>
+	<script>
+    function updateUrlQuery(key, value) {
+      const url = new URL(window.location.href);
+      url.searchParams.set(key, value);
+      window.location.href = url.toString();
+    }
+  </script>
 }

@@ -2,6 +2,7 @@ package templates
 
 import (
 	"github.com/adwinying/weatherotg/templates/components"
+	"github.com/adwinying/weatherotg/lib"
 )
 
 func getTitle(title string) string {
@@ -46,7 +47,7 @@ script BodyScripts() {
 	document.addEventListener('htmx:sendError', flashErrorAlert)
 }
 
-templ Layout(metaTags, content templ.Component) {
+templ Layout(metaTags templ.Component, mode *lib.DisplayMode, content templ.Component) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -73,14 +74,18 @@ templ Layout(metaTags, content templ.Component) {
 			class="bg-base-100 min-h-screen"
 			onload={ BodyScripts() }
 		>
-			<div class="mx-auto container max-w-lg" hx-boost="true" hx-push-url="true">
-				<div class="py-3">
-					@components.Header()
-				</div>
+			<div class="mx-auto px-3 container max-w-lg" hx-boost="true" hx-push-url="true">
+				if mode == nil || *mode != lib.Minimal {
+					<div class="py-3">
+						@components.Header()
+					</div>
+				}
 				@content
-				<div class="py-3">
-					@components.Footer()
-				</div>
+				if mode == nil || *mode != lib.Minimal {
+					<div class="py-3">
+						@components.Footer()
+					</div>
+				}
 				<div id="error-alerts" class="fixed top-4 right-4 w-[clamp(20rem,33vw,25rem)] space-y-3"></div>
 			</div>
 			<script src="https://unpkg.com/htmx.org@1.9.10"></script>
