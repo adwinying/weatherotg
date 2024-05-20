@@ -7,23 +7,47 @@ import (
 	"fmt"
 )
 
-func formattedForecastsToTemplateForecasts(formatted []lib.FormattedForecastWeatherInfo) []components.Forecast {
+func formattedForecastsToTemplateForecasts(
+	unit lib.TemperatureUnit,
+	formatted []lib.FormattedForecastWeatherInfo,
+) []components.Forecast {
 	result := []components.Forecast{}
 	for _, forecast := range formatted {
+		temp := func() string {
+			if unit == lib.Celsius {
+				return forecast.Detail.TempC + "°C"
+			} else {
+				return forecast.Detail.TempF + "°F"
+			}
+		}()
+
+		wind := func() string {
+			if unit == lib.Celsius {
+				return fmt.Sprintf("%.0fm/s", forecast.WindSpeedMs)
+			} else {
+				return fmt.Sprintf("%smph", forecast.Detail.WindSpeedMiles)
+			}
+		}()
+
 		result = append(result, components.Forecast{
 			Title:        forecast.Timestamp.Format("15:04"),
 			Description:  forecast.Description,
 			Icon:         forecast.Icon,
-			TempC:        forecast.Detail.TempC,
+			Temperature:  temp,
 			ChanceOfRain: forecast.Detail.ChanceOfRain,
-			WindSpeedMs:  fmt.Sprintf("%d", int(forecast.WindSpeedMs)),
+			WindSpeed:    wind,
 		})
 	}
 
 	return result
 }
 
-templ IndexContent(mode lib.DisplayMode, location string, weatherInfo *lib.FormattedWeather) {
+templ IndexContent(
+	mode lib.DisplayMode,
+	unit lib.TemperatureUnit,
+	location string,
+	weatherInfo *lib.FormattedWeather,
+) {
 	if mode != lib.Minimal {
 		<div class="flex items-center justify-end gap-3">
 			<span
@@ -78,15 +102,51 @@ templ IndexContent(mode lib.DisplayMode, location string, weatherInfo *lib.Forma
 				<p class="leading-snug">
 					{ weatherInfo.Current.Description }
 					<br/>
-					{ weatherInfo.Current.Detail.TempC }°C,
-					{ fmt.Sprintf("%.2f", weatherInfo.Current.WindSpeedMs) }m/s
+					if unit == lib.Celsius && mode != lib.Minimal {
+						{ weatherInfo.Current.Detail.TempC }°C/<a class="underline" href="?unit=f" onclick="onUnitUpdate(event, 'f')">°F</a>
+						<span
+							id="click-unit-loading"
+							class="hidden h-full inline-flex items-center justify-center *:animate-spin"
+						>
+							@i.Icon("mdi:loading", i.Params().SetDimensions(16, 16))
+						</span>,
+						{ fmt.Sprintf("%.2f", weatherInfo.Current.WindSpeedMs) }m/s
+					} else if unit == lib.Celsius && mode == lib.Minimal {
+						{ weatherInfo.Current.Detail.TempC }°C,
+						{ fmt.Sprintf("%.2f", weatherInfo.Current.WindSpeedMs) }m/s
+					} else if unit == lib.Fahrenheit && mode != lib.Minimal {
+						{ weatherInfo.Current.Detail.TempF }°F/<a class="underline" href="?unit=c" onclick="onUnitUpdate(event, 'c')">°C</a>
+						<span
+							id="click-unit-loading"
+							class="hidden h-full inline-flex items-center justify-center *:animate-spin"
+						>
+							@i.Icon("mdi:loading", i.Params().SetDimensions(16, 16))
+						</span>,
+						{ weatherInfo.Current.Detail.WindSpeedMiles }mph
+					} else if unit == lib.Fahrenheit && mode == lib.Minimal {
+						{ weatherInfo.Current.Detail.TempF }°F,
+						{ weatherInfo.Current.Detail.WindSpeedMiles }mph
+					}
 					{ weatherInfo.Current.Detail.Winddir16Point }
 				</p>
+				<script>
+          function onUnitUpdate(e, unit) {
+            e.preventDefault()
+            updateUrlQuery('unit', unit)
+            const $loading = document.querySelector('#click-unit-loading')
+            $loading.classList.remove('hidden')
+            const $content = document.querySelector('#weather-info')
+            $content.classList.add('opacity-50')
+          }
+        </script>
 			</div>
 		</div>
 		<div class="space-y-3 mb-6">
 			if mode == lib.Default {
-				@components.ForecastGroup(formattedForecastsToTemplateForecasts(weatherInfo.Forecast[:]))
+				@components.ForecastGroup(formattedForecastsToTemplateForecasts(
+					unit,
+					weatherInfo.Forecast[:],
+				))
 			}
 			if mode == lib.Extended {
 				for _, daily := range weatherInfo.Daily {
@@ -94,7 +154,10 @@ templ IndexContent(mode lib.DisplayMode, location string, weatherInfo *lib.Forma
 						<h3 class="mb-3 font-bold text-center">
 							{ daily.Timestamp.Format("2006/01/02") }
 						</h3>
-						@components.ForecastGroup(formattedForecastsToTemplateForecasts(daily.Hourly[:]))
+						@components.ForecastGroup(formattedForecastsToTemplateForecasts(
+							unit,
+							daily.Hourly[:],
+						))
 					</div>
 				}
 			}

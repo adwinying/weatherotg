@@ -25,6 +25,12 @@ func indexViewHandler(w http.ResponseWriter, r *http.Request) {
 		mode = lib.Default
 	}
 
+	// Extract unit param from query string
+	unit, err := lib.ParseTemperatureUnit(r.URL.Query().Get("unit"))
+	if err != nil {
+		unit = lib.Celsius
+	}
+
 	// Get location from IP
 	ip := strings.Split(r.RemoteAddr, ":")[0]
 	city, err := lib.GetCityFromIp(ip)
@@ -50,7 +56,7 @@ func indexViewHandler(w http.ResponseWriter, r *http.Request) {
 	indexTemplate := templates.Layout(
 		templates.MetaTags("WeatherOTG", "", ""),
 		&mode,
-		pages.IndexContent(mode, city, formattedWeatherInfo),
+		pages.IndexContent(mode, unit, city, formattedWeatherInfo),
 	)
 
 	// Render index page template.

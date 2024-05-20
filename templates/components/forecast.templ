@@ -8,9 +8,9 @@ type Forecast struct {
 	Title        string
 	Description  string
 	Icon         string
-	TempC        string
+	Temperature  string
 	ChanceOfRain string
-	WindSpeedMs  string
+	WindSpeed    string
 }
 
 templ forecastEntry(forecast Forecast) {
@@ -21,9 +21,9 @@ templ forecastEntry(forecast Forecast) {
 		</div>
 		<div class="grid grid-cols-[min-content_1fr] gap-x-2 gap-y-1">
 			@i.Icon("mdi:thermometer-lines", i.Params().SetDimensions(20, 20))
-			<span>{ forecast.TempC }°C</span>
+			<span>{ forecast.Temperature }</span>
 			@i.Icon("mdi:weather-windy", i.Params().SetDimensions(20, 20))
-			<span>{ forecast.WindSpeedMs }m/s</span>
+			<span>{ forecast.WindSpeed }</span>
 			@i.Icon("mdi:cloud-percent", i.Params().SetDimensions(20, 20))
 			<span>{ forecast.ChanceOfRain }%</span>
 		</div>
