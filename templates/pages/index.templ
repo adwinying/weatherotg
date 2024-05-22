@@ -102,10 +102,17 @@ templ IndexContent(
 					{ weatherInfo.Current.Description }
 					<br/>
 					if unit == lib.Celsius && mode != lib.Minimal {
-						{ weatherInfo.Current.Detail.TempC }°C/<a class="underline" href="?unit=f" onclick="onUnitUpdate(event, 'f')">°F</a>
+						{ weatherInfo.Current.Detail.TempC }°C/<a
+	class="underline"
+	href={ templ.URL(fmt.Sprintf("?mode=%s&unit=f", mode)) }
+	hx-get={ fmt.Sprintf("?mode=%s&unit=f", mode) }
+	hx-target="#index-content"
+	hx-indicator="#click-unit-loading"
+	hx-trigger="click"
+>°F</a>
 						<span
 							id="click-unit-loading"
-							class="hidden h-full inline-flex items-center justify-center *:animate-spin"
+							class="htmx-request:inline-flex hidden h-full items-center justify-center *:animate-spin"
 						>
 							@i.Icon("mdi:loading", i.Params().SetDimensions(16, 16))
 						</span>,
@@ -114,10 +121,17 @@ templ IndexContent(
 						{ weatherInfo.Current.Detail.TempC }°C,
 						{ fmt.Sprintf("%.2f", weatherInfo.Current.WindSpeedMs) }m/s
 					} else if unit == lib.Fahrenheit && mode != lib.Minimal {
-						{ weatherInfo.Current.Detail.TempF }°F/<a class="underline" href="?unit=c" onclick="onUnitUpdate(event, 'c')">°C</a>
+						{ weatherInfo.Current.Detail.TempF }°F/<a
+	class="underline"
+	href={ templ.URL(fmt.Sprintf("?mode=%s&unit=c", mode)) }
+	hx-get={ fmt.Sprintf("?mode=%s&unit=c", mode) }
+	hx-target="#index-content"
+	hx-indicator="#click-unit-loading"
+	hx-trigger="click"
+>°C</a>
 						<span
 							id="click-unit-loading"
-							class="hidden h-full inline-flex items-center justify-center *:animate-spin"
+							class="htmx-request:inline-flex hidden h-full items-center justify-center *:animate-spin"
 						>
 							@i.Icon("mdi:loading", i.Params().SetDimensions(16, 16))
 						</span>,
@@ -128,16 +142,6 @@ templ IndexContent(
 					}
 					{ weatherInfo.Current.Detail.Winddir16Point }
 				</p>
-				<script>
-          function onUnitUpdate(e, unit) {
-            e.preventDefault()
-            updateUrlQuery('unit', unit)
-            const $loading = document.querySelector('#click-unit-loading')
-            $loading.classList.remove('hidden')
-            const $content = document.querySelector('#weather-info')
-            $content.classList.add('opacity-50')
-          }
-        </script>
 			</div>
 		</div>
 		<div class="space-y-3 mb-6">
@@ -161,12 +165,5 @@ templ IndexContent(
 				}
 			}
 		</div>
-		<script>
-      function updateUrlQuery(key, value) {
-        const url = new URL(window.location.href);
-        url.searchParams.set(key, value);
-        window.location.href = url.toString();
-      }
-    </script>
 	</div>
 }
