@@ -54,7 +54,7 @@ templ Layout(metaTags templ.Component, mode *lib.DisplayMode, content templ.Comp
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-			<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://unpkg.com; connect-src 'self' ws://localhost:*; img-src 'self' data:*;"/>
+			<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com; connect-src 'self' ws://localhost:*; img-src 'self' data:*;"/>
 			<meta name="theme-color" content="#FEFEF5"/>
 			@metaTags
 			<link rel="dns-prefetch" href="//fonts.googleapis.com"/>
@@ -75,17 +75,19 @@ templ Layout(metaTags templ.Component, mode *lib.DisplayMode, content templ.Comp
 			onload={ BodyScripts() }
 		>
 			<div class="mx-auto px-3 container max-w-lg" hx-boost="true" hx-push-url="true">
-				if mode == nil || *mode != lib.Minimal {
-					<div class="py-3">
-						@components.Header()
-					</div>
-				}
-				@content
-				if mode == nil || *mode != lib.Minimal {
-					<div class="py-3">
-						@components.Footer()
-					</div>
-				}
+				<div id="content">
+					if mode == nil || *mode != lib.Minimal {
+						<div class="py-3">
+							@components.Header()
+						</div>
+					}
+					@content
+					if mode == nil || *mode != lib.Minimal {
+						<div class="py-3">
+							@components.Footer()
+						</div>
+					}
+				</div>
 				<div id="error-alerts" class="fixed top-4 right-4 w-[clamp(20rem,33vw,25rem)] space-y-3"></div>
 			</div>
 			<script src="https://unpkg.com/htmx.org@1.9.10"></script>

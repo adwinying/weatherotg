@@ -48,51 +48,50 @@ templ IndexContent(
 	location string,
 	weatherInfo *lib.FormattedWeather,
 ) {
-	if mode != lib.Minimal {
-		<div class="flex items-center justify-end gap-3">
-			<span
-				id="select-mode-loading"
-				class="hidden h-full flex items-center justify-center *:animate-spin"
-			>
-				@i.Icon("mdi:loading", i.Params().SetDimensions(28, 28))
-			</span>
-			<label class="relative form-control w-fit">
-				<div
-					id="select-mode-overlay"
-					class="hidden absolute bg-white/10 inset-0 z-50 rounded-lg"
-				></div>
-				<select
-					id="select-mode"
-					class="select select-bordered max-w-xs"
-					onchange="onModeUpdate(event)"
-				>
-					<option disabled>Display Mode</option>
-					for _, displayMode := range lib.DisplayModeOrder {
-						<option
-							selected?={ mode == displayMode }
-							value={ string(displayMode) }
-						>
-							{ lib.DisplayModeStringMap[displayMode] }
-						</option>
-					}
-				</select>
-			</label>
-		</div>
+	<div
+		id="index-content"
+		hx-on::before-swap="beforeWeatherInfoSwap(event)"
+	>
 		<script>
-      function onModeUpdate(e) {
-        updateUrlQuery('mode', e.target.value)
-        const $loading = document.querySelector('#select-mode-loading')
-        $loading.classList.remove('hidden')
-        const $overlay = document.querySelector('#select-mode-overlay')
-        $overlay.classList.remove('hidden')
-        const $select = document.querySelector('#select-mode')
-        $select.disabled = true
-        const $content = document.querySelector('#weather-info')
-        $content.classList.add('opacity-50')
+      function beforeWeatherInfoSwap(e) {
+        if (!e.detail.shouldSwap) return
+        if (e.detail.requestConfig.elt.value !== 'minimal') return
+
+        e.detail.target = htmx.find('#content')
       }
     </script>
-	}
-	<div id="weather-info">
+		if mode != lib.Minimal {
+			<div class="flex items-center justify-end gap-3">
+				<span
+					id="select-mode-loading"
+					class="htmx-request:flex hidden h-full items-center justify-center *:animate-spin"
+				>
+					@i.Icon("mdi:loading", i.Params().SetDimensions(28, 28))
+				</span>
+				<label class="relative form-control w-fit">
+					<select
+						id="select-mode"
+						name="mode"
+						class="select select-bordered max-w-xs"
+						hx-get="/"
+						hx-target="#index-content"
+						hx-indicator="#select-mode-loading"
+						hx-vals={ fmt.Sprintf("{\"unit\": \"%s\"}", unit) }
+						hx-trigger="change"
+					>
+						<option disabled>Display Mode</option>
+						for _, displayMode := range lib.DisplayModeOrder {
+							<option
+								selected?={ mode == displayMode }
+								value={ string(displayMode) }
+							>
+								{ lib.DisplayModeStringMap[displayMode] }
+							</option>
+						}
+					</select>
+				</label>
+			</div>
+		}
 		<div class="flex items-center gap-3 mx-auto max-w-fit my-4">
 			<div>
 				@i.Icon(weatherInfo.Current.Icon, i.Params().SetDimensions(80, 80))
@@ -162,12 +161,12 @@ templ IndexContent(
 				}
 			}
 		</div>
+		<script>
+      function updateUrlQuery(key, value) {
+        const url = new URL(window.location.href);
+        url.searchParams.set(key, value);
+        window.location.href = url.toString();
+      }
+    </script>
 	</div>
-	<script>
-    function updateUrlQuery(key, value) {
-      const url = new URL(window.location.href);
-      url.searchParams.set(key, value);
-      window.location.href = url.toString();
-    }
-  </script>
 }

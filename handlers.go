@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/a-h/templ"
 	"github.com/angelofallars/htmx-go"
 
 	"github.com/adwinying/weatherotg/lib"
@@ -53,14 +54,26 @@ func indexViewHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Define template layout for index page.
-	indexTemplate := templates.Layout(
-		templates.MetaTags("WeatherOTG", "", ""),
-		&mode,
-		pages.IndexContent(mode, unit, city, formattedWeatherInfo),
-	)
+	page := func() templ.Component {
+		// Return weather info component only if request is htmx
+		if htmx.IsHTMX(r) {
+			return pages.IndexContent(
+				mode,
+				unit,
+				city,
+				formattedWeatherInfo,
+			)
+		}
+
+		return templates.Layout(
+			templates.MetaTags("WeatherOTG", "", ""),
+			&mode,
+			pages.IndexContent(mode, unit, city, formattedWeatherInfo),
+		)
+	}()
 
 	// Render index page template.
-	if err := htmx.NewResponse().RenderTempl(r.Context(), w, indexTemplate); err != nil {
+	if err := htmx.NewResponse().RenderTempl(r.Context(), w, page); err != nil {
 		errorHandler(w, r, http.StatusInternalServerError)
 		return
 	}
