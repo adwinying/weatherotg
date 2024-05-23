@@ -38,4 +38,4 @@ jobs:
       uses: superfly/flyctl-actions/setup-flyctl@master
 
     - name: Deploy to fly
-      run: flyctl deploy --remote-only
+      run: flyctl deploy --remote-only --no-cache

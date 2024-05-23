@@ -3,7 +3,7 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "css:build": "tailwindcss -i ./styles.css -o ./static/styles.css",
+    "css:build": "tailwindcss -m -i ./styles.css -o ./static/styles.css",
     "css:watch": "tailwindcss -w -i ./styles.css -o ./static/styles.css"
   },
   "devDependencies": {
