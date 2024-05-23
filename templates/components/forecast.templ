@@ -31,7 +31,7 @@ templ forecastEntry(forecast Forecast) {
 }
 
 templ ForecastGroup(forecasts []Forecast) {
-	<div class="grid grid-cols-4 gap-y-3 divide-x">
+	<div class="grid grid-cols-4 gap-y-5 divide-x">
 		for _, forecast := range forecasts {
 			@forecastEntry(forecast)
 		}
