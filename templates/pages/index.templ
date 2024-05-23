@@ -199,7 +199,7 @@ templ IndexContent(
 				@i.Icon(weatherInfo.Current.Icon, i.Params().SetDimensions(80, 80))
 			</div>
 			<div>
-				<h1 class="text-2xl font-bold">{ location }</h1>
+				<h1 class="text-2xl font-bold">{ weatherInfo.Current.Location }</h1>
 				<p class="leading-snug">
 					{ weatherInfo.Current.Description }
 					<br/>

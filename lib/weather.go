@@ -14,6 +14,19 @@ type WeatherDesc struct {
 	Value string `json:"value"`
 }
 
+type AreaName struct {
+	Value string `json:"value"`
+}
+
+type Region struct {
+	Value string `json:"value"`
+}
+
+type NearestArea struct {
+	AreaName []AreaName `json:"areaName"`
+	Region   []Region   `json:"region"`
+}
+
 type CurrentWeatherDetail struct {
 	LocalObsDateTime string        `json:"localObsDateTime"`
 	TempC            string        `json:"temp_C"`
@@ -42,6 +55,7 @@ type Weather struct {
 
 type WeatherInfo struct {
 	CurrentCondition []CurrentWeatherDetail `json:"current_condition"`
+	NearestArea      []NearestArea          `json:"nearest_area"`
 	Weather          []Weather              `json:"weather"`
 }
 
@@ -73,6 +87,7 @@ func GetWeatherInfo(city string) (*WeatherInfo, error) {
 }
 
 type FormattedCurrentWeatherInfo struct {
+	Location    string
 	Detail      CurrentWeatherDetail
 	Description string
 	WindSpeedMs float64
@@ -143,6 +158,11 @@ func FormatWeatherInfo(info *WeatherInfo) (*FormattedWeather, error) {
 		}
 
 		result := FormattedCurrentWeatherInfo{
+			Location: fmt.Sprintf(
+				"%s, %s",
+				info.NearestArea[0].AreaName[0].Value,
+				info.NearestArea[0].Region[0].Value,
+			),
 			Detail:      info.CurrentCondition[0],
 			Description: info.CurrentCondition[0].WeatherDesc[0].Value,
 			WindSpeedMs: getWindSpeedMs(info.CurrentCondition[0].WindSpeedKmph),
