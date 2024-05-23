@@ -47,7 +47,6 @@ logs/
 *.sln
 *.sw?
 *.local
-*.lockb
 *.test
 *.tmp
 *.out

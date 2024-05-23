@@ -1,0 +1,56 @@
+# flyctl launch added from .gitignore
+# Auto-generated .gitignore file.
+# See https://gowebly.org for more information.
+
+# macOS files.
+**/.DS_Store
+
+# IDE files.
+**/.idea
+**/.vscode
+
+# Go workflow files.
+**/go.work
+
+# Environment files.
+**/.env
+
+# Generated folders.
+**/bin
+**/dist-ssr
+**/dist
+**/*_templ.go
+
+# Vendor folders.
+**/vendor
+**/node_modules
+
+# Temp folders.
+**/tmp
+
+# Nix
+**/.direnv
+
+# Logs.
+**/logs
+**/*.log
+
+# Ignore by extensions.
+**/*.exe
+**/*.exe~
+**/*.dll
+**/*.so
+**/*.dylib
+**/*.suo
+**/*.ntvs*
+**/*.njsproj
+**/*.sln
+**/*.sw?
+**/*.local
+**/*.test
+**/*.tmp
+**/*.out
+
+# flyctl launch added from node_modules/tailwindcss/stubs/.gitignore
+!node_modules/tailwindcss/stubs/**/*
+fly.toml

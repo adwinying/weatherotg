@@ -17,11 +17,13 @@
           air
           templ
           mprocs
+          flyctl
         ];
 
         shellHook = ''
           echo "`${pkgs.go}/bin/go version`"
           echo "bun: v`${pkgs.bun}/bin/bun --version`"
+          echo "`${pkgs.flyctl}/bin/flyctl version`"
         '';
       };
     });
