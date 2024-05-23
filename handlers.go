@@ -85,7 +85,7 @@ func indexViewHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		return templates.Layout(
-			templates.MetaTags("WeatherOTG", "", ""),
+			templates.MetaTags("", "", ""),
 			&mode,
 			pages.IndexContent(
 				isLocationSet,
