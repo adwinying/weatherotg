@@ -5,6 +5,7 @@ import (
 	"github.com/adwinying/weatherotg/templates/components"
 	i "github.com/callsamu/templicons"
 	"fmt"
+	"strings"
 )
 
 func formattedForecastsToTemplateForecasts(
@@ -42,10 +43,62 @@ func formattedForecastsToTemplateForecasts(
 	return result
 }
 
+type FormatParams struct {
+	IsLocationSet bool
+	Location      string
+	IsModeSet     bool
+	Mode          lib.DisplayMode
+	IsUnitSet     bool
+	Unit          lib.TemperatureUnit
+}
+
+func formatUrl(params FormatParams) string {
+	queries := []string{}
+
+	if params.IsLocationSet && params.Location != "" {
+		queries = append(queries, "location="+params.Location)
+	}
+
+	if params.IsModeSet && params.Mode != "" {
+		queries = append(queries, "mode="+string(params.Mode))
+	}
+
+	if params.IsUnitSet && params.Unit != "" {
+		queries = append(queries, "unit="+string(params.Unit))
+	}
+
+	if len(queries) == 0 {
+		return "/"
+	}
+
+	return fmt.Sprintf("/?%s", strings.Join(queries, "&"))
+}
+
+func formatJson(params FormatParams) string {
+	keyVals := []string{}
+
+	if params.IsLocationSet && params.Location != "" {
+		keyVals = append(keyVals, fmt.Sprintf("\"location\": \"%s\"", params.Location))
+	}
+
+	if params.IsModeSet && params.Mode != "" {
+		keyVals = append(keyVals, fmt.Sprintf("\"mode\": \"%s\"", string(params.Mode)))
+	}
+
+	if params.IsUnitSet && params.Unit != "" {
+		keyVals = append(keyVals, fmt.Sprintf("\"unit\": \"%s\"", string(params.Unit)))
+	}
+
+	return fmt.Sprintf("{%s}", strings.Join(keyVals, ","))
+}
+
 templ IndexContent(
-	mode lib.DisplayMode,
-	unit lib.TemperatureUnit,
+	isLocationSet bool,
 	location string,
+	isModeSet bool,
+	mode lib.DisplayMode,
+	isUnitSet bool,
+	unit lib.TemperatureUnit,
 	weatherInfo *lib.FormattedWeather,
 ) {
 	<div
@@ -61,35 +114,84 @@ templ IndexContent(
       }
     </script>
 		if mode != lib.Minimal {
-			<div class="flex items-center justify-end gap-3">
-				<span
-					id="select-mode-loading"
-					class="htmx-request:flex hidden h-full items-center justify-center *:animate-spin"
+			<div class="flex items-center justify-between gap-3">
+				<label
+					id="search-location"
+					class="input input-bordered flex items-center gap-2 min-w-0 max-w-[15rem]"
 				>
-					@i.Icon("mdi:loading", i.Params().SetDimensions(28, 28))
-				</span>
-				<label class="relative form-control w-fit">
-					<select
-						id="select-mode"
-						name="mode"
-						class="select select-bordered max-w-xs"
+					<span class="shrink-0">
+						@i.Icon("mdi:magnify", i.Params().SetDimensions(16, 16))
+					</span>
+					<input
+						type="text"
+						name="location"
+						class="min-w-0 grow"
+						placeholder="Search"
+						value={ location }
 						hx-get="/"
+						hx-swap="outerHTML"
 						hx-target="#index-content"
-						hx-indicator="#select-mode-loading"
-						hx-vals={ fmt.Sprintf("{\"unit\": \"%s\"}", unit) }
+						hx-indicator="#search-location"
+						hx-vals={ formatJson(FormatParams{
+								IsModeSet: isModeSet,
+								Mode: mode,
+								IsUnitSet: isUnitSet,
+								Unit: unit,
+						}) }
 						hx-trigger="change"
+					/>
+					if !isLocationSet {
+						<div
+							class="htmx-request:hidden tooltip flex items-center"
+							data-tip="Location determined by your IP address"
+						>
+							<button>
+								@i.Icon("mdi:help-circle", i.Params().SetDimensions(16, 16))
+							</button>
+						</div>
+					}
+					<span
+						class="htmx-request:flex hidden h-full items-center justify-center *:animate-spin"
 					>
-						<option disabled>Display Mode</option>
-						for _, displayMode := range lib.DisplayModeOrder {
-							<option
-								selected?={ mode == displayMode }
-								value={ string(displayMode) }
-							>
-								{ lib.DisplayModeStringMap[displayMode] }
-							</option>
-						}
-					</select>
+						@i.Icon("mdi:loading", i.Params().SetDimensions(16, 16))
+					</span>
 				</label>
+				<div class="flex items-center gap-3">
+					<span
+						id="select-mode-loading"
+						class="htmx-request:flex hidden h-full items-center justify-center *:animate-spin"
+					>
+						@i.Icon("mdi:loading", i.Params().SetDimensions(28, 28))
+					</span>
+					<label class="relative form-control w-fit">
+						<select
+							id="select-mode"
+							name="mode"
+							class="select select-bordered max-w-xs"
+							hx-get="/"
+							hx-swap="outerHTML"
+							hx-target="#index-content"
+							hx-indicator="#select-mode-loading"
+							hx-vals={ formatJson(FormatParams{
+								IsLocationSet: isLocationSet,
+								Location: location,
+								IsUnitSet: isUnitSet,
+								Unit: unit,
+							}) }
+							hx-trigger="change"
+						>
+							<option disabled>Display Mode</option>
+							for _, displayMode := range lib.DisplayModeOrder {
+								<option
+									selected?={ mode == displayMode }
+									value={ string(displayMode) }
+								>
+									{ lib.DisplayModeStringMap[displayMode] }
+								</option>
+							}
+						</select>
+					</label>
+				</div>
 			</div>
 		}
 		<div class="flex items-center gap-3 mx-auto max-w-fit my-4">
@@ -104,8 +206,23 @@ templ IndexContent(
 					if unit == lib.Celsius && mode != lib.Minimal {
 						{ weatherInfo.Current.Detail.TempC }°C/<a
 	class="underline"
-	href={ templ.URL(fmt.Sprintf("?mode=%s&unit=f", mode)) }
-	hx-get={ fmt.Sprintf("?mode=%s&unit=f", mode) }
+	href={ templ.URL(formatUrl(FormatParams{
+		IsLocationSet: isLocationSet,
+		Location: location,
+		IsModeSet: isModeSet,
+		Mode: mode,
+		IsUnitSet: true,
+		Unit: lib.Fahrenheit,
+	})) }
+	hx-get={ formatUrl(FormatParams{
+		IsLocationSet: isLocationSet,
+		Location: location,
+		IsModeSet: isModeSet,
+		Mode: mode,
+		IsUnitSet: true,
+		Unit: lib.Fahrenheit,
+	}) }
+	hx-swap="outerHTML"
 	hx-target="#index-content"
 	hx-indicator="#click-unit-loading"
 	hx-trigger="click"
@@ -123,8 +240,23 @@ templ IndexContent(
 					} else if unit == lib.Fahrenheit && mode != lib.Minimal {
 						{ weatherInfo.Current.Detail.TempF }°F/<a
 	class="underline"
-	href={ templ.URL(fmt.Sprintf("?mode=%s&unit=c", mode)) }
-	hx-get={ fmt.Sprintf("?mode=%s&unit=c", mode) }
+	href={ templ.URL(formatUrl(FormatParams{
+		IsLocationSet: isLocationSet,
+		Location: location,
+		IsModeSet: isModeSet,
+		Mode: mode,
+		IsUnitSet: true,
+		Unit: lib.Celsius,
+	})) }
+	hx-get={ formatUrl(FormatParams{
+		IsLocationSet: isLocationSet,
+		Location: location,
+		IsModeSet: isModeSet,
+		Mode: mode,
+		IsUnitSet: true,
+		Unit: lib.Celsius,
+	}) }
+	hx-swap="outerHTML"
 	hx-target="#index-content"
 	hx-indicator="#click-unit-loading"
 	hx-trigger="click"

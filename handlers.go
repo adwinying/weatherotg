@@ -20,27 +20,37 @@ func indexViewHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Extract location param from query string
+	location := r.URL.Query().Get("location")
+	isLocationSet := location != ""
+	if location == "" {
+		// Get location from IP
+		ip := strings.Split(r.RemoteAddr, ":")[0]
+		city, err := lib.GetCityFromIp(ip)
+		if err != nil || city == "Undefined" {
+			city = "Tokyo"
+		}
+		location = city
+	}
+
 	// Extract mode param from query string
-	mode, err := lib.ParseDisplayMode(r.URL.Query().Get("mode"))
+  modeQuery := r.URL.Query().Get("mode")
+	mode, err := lib.ParseDisplayMode(modeQuery)
+  isModeSet := modeQuery != ""
 	if err != nil {
 		mode = lib.Default
 	}
 
 	// Extract unit param from query string
-	unit, err := lib.ParseTemperatureUnit(r.URL.Query().Get("unit"))
+  unitQuery := r.URL.Query().Get("unit")
+	unit, err := lib.ParseTemperatureUnit(unitQuery)
+  isUnitSet := unitQuery != ""
 	if err != nil {
 		unit = lib.Celsius
 	}
 
-	// Get location from IP
-	ip := strings.Split(r.RemoteAddr, ":")[0]
-	city, err := lib.GetCityFromIp(ip)
-	if err != nil || city == "Undefined" {
-		city = "Tokyo"
-	}
-
 	// Get weather info
-	weatherInfo, err := lib.GetWeatherInfo(city)
+	weatherInfo, err := lib.GetWeatherInfo(location)
 	if err != nil {
 		errorHandler(w, r, http.StatusInternalServerError)
 		return
@@ -58,9 +68,12 @@ func indexViewHandler(w http.ResponseWriter, r *http.Request) {
 		// Return weather info component only if request is htmx
 		if htmx.IsHTMX(r) {
 			return pages.IndexContent(
+				isLocationSet,
+				location,
+        isModeSet,
 				mode,
+        isUnitSet,
 				unit,
-				city,
 				formattedWeatherInfo,
 			)
 		}
@@ -68,7 +81,15 @@ func indexViewHandler(w http.ResponseWriter, r *http.Request) {
 		return templates.Layout(
 			templates.MetaTags("WeatherOTG", "", ""),
 			&mode,
-			pages.IndexContent(mode, unit, city, formattedWeatherInfo),
+			pages.IndexContent(
+				isLocationSet,
+				location,
+        isModeSet,
+				mode,
+        isUnitSet,
+				unit,
+				formattedWeatherInfo,
+			),
 		)
 	}()
 
