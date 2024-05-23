@@ -25,7 +25,13 @@ func indexViewHandler(w http.ResponseWriter, r *http.Request) {
 	isLocationSet := location != ""
 	if location == "" {
 		// Get location from IP
-		ip := strings.Split(r.RemoteAddr, ":")[0]
+		ip := strings.Split(r.Header.Get("x-forwarded-for"), ", ")[0]
+		if ip == "" {
+			ip = strings.Split(r.Header.Get("x-real-ip"), ", ")[0]
+		}
+		if ip == "" {
+			ip = strings.Split(r.RemoteAddr, ":")[0]
+		}
 		city, err := lib.GetCityFromIp(ip)
 		if err != nil || city == "Undefined" {
 			city = "Tokyo"
