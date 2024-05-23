@@ -40,17 +40,17 @@ func indexViewHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Extract mode param from query string
-  modeQuery := r.URL.Query().Get("mode")
+	modeQuery := r.URL.Query().Get("mode")
 	mode, err := lib.ParseDisplayMode(modeQuery)
-  isModeSet := modeQuery != ""
+	isModeSet := modeQuery != ""
 	if err != nil {
 		mode = lib.Default
 	}
 
 	// Extract unit param from query string
-  unitQuery := r.URL.Query().Get("unit")
+	unitQuery := r.URL.Query().Get("unit")
 	unit, err := lib.ParseTemperatureUnit(unitQuery)
-  isUnitSet := unitQuery != ""
+	isUnitSet := unitQuery != ""
 	if err != nil {
 		unit = lib.Celsius
 	}
@@ -76,9 +76,9 @@ func indexViewHandler(w http.ResponseWriter, r *http.Request) {
 			return pages.IndexContent(
 				isLocationSet,
 				location,
-        isModeSet,
+				isModeSet,
 				mode,
-        isUnitSet,
+				isUnitSet,
 				unit,
 				formattedWeatherInfo,
 			)
@@ -90,9 +90,9 @@ func indexViewHandler(w http.ResponseWriter, r *http.Request) {
 			pages.IndexContent(
 				isLocationSet,
 				location,
-        isModeSet,
+				isModeSet,
 				mode,
-        isUnitSet,
+				isUnitSet,
 				unit,
 				formattedWeatherInfo,
 			),

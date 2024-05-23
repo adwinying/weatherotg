@@ -24,7 +24,7 @@ func GetCityFromIp(ip string) (string, error) {
 		return "", err
 	}
 
-  slog.Info("City from IP", "ip", ip, "city", string(resBody))
+	slog.Info("City from IP", "ip", ip, "city", string(resBody))
 
 	return string(resBody), nil
 }
