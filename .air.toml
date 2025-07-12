@@ -6,7 +6,7 @@ tmp_dir = "tmp"
 
 [build]
 pre_cmd = []
-cmd = "go run github.com/a-h/templ/cmd/templ@latest generate && go build -o ./tmp/gowebly_default ."
+cmd = "go run github.com/a-h/templ/cmd/templ@v0.2.639 generate && go build -o ./tmp/gowebly_default ."
 bin = "tmp/gowebly_default"
 include_ext = ["go", "templ", "html", "json", "js", "ts", "css", "scss"]
 exclude_dir = [".parcel-cache", "bin", "dist", "node_modules", "static", "tmp", "tests", "vendor"]
