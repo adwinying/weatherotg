@@ -1,5 +1,5 @@
 procs:
   css:
-    shell: "bun run css:watch"
+    shell: "mise css"
   dev:
-    shell: "air"
+    shell: "mise dev"

@@ -1,0 +1,25 @@
+[tools]
+air = "latest"
+"aqua:a-h/templ" = "0.2.639"
+bun = "latest"
+go = "1.22"
+mprocs = "latest"
+"npm:figlet" = "latest"
+
+[hooks]
+enter = """
+figlet weatherotg
+echo "$(go version)"
+echo "bun: v$(bun --version)"
+"""
+
+[tasks.css]
+description = "Watch CSS files"
+run = "bun run css:watch"
+
+[tasks.dev]
+description = "Start development server"
+run = "air"
+
+[settings]
+experimental = true
