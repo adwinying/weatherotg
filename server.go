@@ -23,6 +23,10 @@ func runServer() error {
 
 	mux := http.NewServeMux()
 
+	mux.HandleFunc("GET /up", func (w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("👋 Up and running!"))
+	})
+
 	// Handle static files from the embed FS (with a custom handler).
 	mux.Handle("GET /static/", gowebly.StaticFileServerHandler(http.FS(static)))
 
