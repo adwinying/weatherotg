@@ -19,5 +19,6 @@ RUN go run github.com/a-h/templ/cmd/templ@v0.2.639 generate && go build -o weath
 
 FROM alpine:latest
 
+LABEL org.opencontainers.image.source=https://github.com/adwinying/weatherotg
 COPY --from=builder /app/weatherotg /app/
 CMD ["/app/weatherotg"]
