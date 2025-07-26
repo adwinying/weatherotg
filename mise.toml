@@ -21,5 +21,9 @@ run = "bun run css:watch"
 description = "Start development server"
 run = "air"
 
+[tasks.format]
+description = "Format Go code"
+run = "go fmt ./..."
+
 [settings]
 experimental = true

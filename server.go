@@ -23,7 +23,7 @@ func runServer() error {
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("GET /up", func (w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("GET /up", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("👋 Up and running!"))
 	})
 
