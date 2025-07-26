@@ -2,6 +2,7 @@
 air = "latest"
 "aqua:a-h/templ" = "0.2.639"
 bun = "latest"
+"gem:kamal" = "latest"
 go = "1.22"
 mprocs = "latest"
 "npm:figlet" = "latest"
